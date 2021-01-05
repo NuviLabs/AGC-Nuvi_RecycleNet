@@ -1,2 +1,3 @@
 # AGC-Nuvi_RecycleNet
-Effective trash detection model.
+Effective trash detection model for AI Grand Challenge 2020 track 3 round 1.
+Nuvilabs Solution.
