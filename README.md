@@ -22,5 +22,5 @@ Run inference
 
     python main.py --img_path ./sample_img.jpg
 Will return a dictionary with the following format:
-{'Annotations': [{'Label': 'steel', 'Bbox': [564, 383, 695, 443], 'Confidence': 0.9856872}]}
+{'Annotations': [{'Label': 'steel', 'Bbox': [564, 383, 695, 443], 'Confidence': 0.9856872}]}  
 The bbox format follows: [xmin, ymin, xmax, ymax]
