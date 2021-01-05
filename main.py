@@ -8,7 +8,7 @@
 import argparse
 import os.path as osp
 import glob
-from drs_infer import Nuvi_RecycleNet
+from inference import Nuvi_RecycleNet
 
 
 parser = argparse.ArgumentParser(
@@ -19,7 +19,7 @@ parser.add_argument('--checkpoint_file', default='./model/model_checkpoint.pth',
                     help='Model checkpoint file path.')
 parser.add_argument('--img_path', default='./sample_img.jpg', type=str,
                     help='Path of image or images.')
-parser.add_argument('--threshold', default=0.5, type=float,
+parser.add_argument('--threshold', default=0.6, type=float,
                     help='Only boxes with the score larger than this will be detected.')
 parser.add_argument('--use_tta', dest='use_tta', action='store_true',
                     help='Either use TTA to help detect images.')
