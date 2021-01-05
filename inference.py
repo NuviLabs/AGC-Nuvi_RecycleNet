@@ -1,28 +1,26 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Thu Jul 23 19:05:08 2020
 
-@author: Nuvilabs-Luca
+
+@author: Nuvilabs - Luca Medeiros, luca.medeiros@nuvi-labs.com
 """
 
-from utils.mmdet.apis import init_detector, inference_detector, show_result_pyplot
-import os
+from utils.mmdet.apis import init_detector, inference_detector
 import numpy as np
 import cv2
 
+
 class Nuvi_RecycleNet():
     def __init__(self,
-                 config_file='./model/model_config.py',
-                 checkpoint_file='./model/model_checkpoint.pth',
-                 output_dir='./output/',
-                 threshold=0.5,
+                 config_file,
+                 checkpoint_file,
+                 threshold,
                  device='cuda:0',
                  tta=True):
 
         self.config_file = config_file
         self.checkpoint_file = checkpoint_file
-        self.output_dir = output_dir
         self.threshold = threshold  # Only boxes with the score larger than this will be detected
         self.tta = tta # Perform TTA on not detected images
 
@@ -59,7 +57,7 @@ class Nuvi_RecycleNet():
         imageArray = cv2.imread(img_path)
         # Run inference using a model on a single picture -> img can be either path or array
         result = inference_detector(self.model, imageArray)
-        res_idxs = [i for i, k in enumerate(result) if k.size != 0 and (k[:,4] > self.threshold).any()]
+        res_idxs = [[i, k[0]] for i, k in enumerate(result[0]) if k.size != 0 and (k[:,4] > self.threshold).any()]
         if self.tta and not res_idxs:
             # Determine which augmentations to do when there is no detection. In order
             aug_type = ['LR', 'UDR', 'RT', 'Break']
@@ -73,15 +71,21 @@ class Nuvi_RecycleNet():
                 print('TTA type: ', augment_type)
                 img_transformed = self.augmentIMG(imageArray, augment_type)
                 result = inference_detector(self.model, img_transformed)
-                res_idxs = [i for i, k in enumerate(result) if k.size != 0 and (k[:,4] > self.threshold).any()]
+                res_idxs = [[i, k[0]] for i, k in enumerate(result[0]) if k.size != 0 and (k[:,4] > self.threshold).any()]
 
         json_result = self.make_json(res_idxs)
 
         return json_result
 
     def make_json(self, results):
-        pass
+        json_dict = {'Annotations': []}
+        for result in results:
+            label_idx = result[0]
+            bbox = result[1][:4].tolist()
+            score = result[1][-1]
+            label_name = self.classes[label_idx]
 
+            dict_result = {'Label': label_name, 'Bbox': bbox, 'Confidence': score}
+            json_dict['Annotations'].append(dict_result)
 
-recycler = Nuvi_RecycleNet()
-json_result = recycler.predict('')
+        return json_dict
